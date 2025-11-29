@@ -11,7 +11,6 @@ import { LockScreen } from './components/LockScreen';
 import { askGemini } from './services/geminiService';
 
 export default function App() {
-  // --- State ---
   const [links, setLinks] = useState<LinkItem[]>(() => {
     const saved = localStorage.getItem('mynav_links');
     return saved ? JSON.parse(saved) : DEFAULT_LINKS;
@@ -24,11 +23,9 @@ export default function App() {
 
   const [settings, setSettings] = useState<AppSettings>(() => {
     const saved = localStorage.getItem('mynav_settings');
-    // Default language to zh
     return saved ? JSON.parse(saved) : { theme: 'dark', language: 'zh' };
   });
 
-  // Lock state defaults to true if a password is set
   const [isLocked, setIsLocked] = useState<boolean>(() => {
     const savedSettings = localStorage.getItem('mynav_settings');
     const parsedSettings = savedSettings ? JSON.parse(savedSettings) : {};
@@ -42,15 +39,11 @@ export default function App() {
   const [isImageEditorOpen, setIsImageEditorOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   
-  // AI State
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [isThinking, setIsThinking] = useState(false);
 
-  // --- Helpers ---
-  // Get current language strings
   const t = TRANSLATIONS[settings.language === 'en' ? 'en' : 'zh'];
 
-  // --- Effects ---
   useEffect(() => {
     localStorage.setItem('mynav_links', JSON.stringify(links));
   }, [links]);
@@ -61,7 +54,6 @@ export default function App() {
 
   useEffect(() => {
     localStorage.setItem('mynav_settings', JSON.stringify(settings));
-    // Handle Theme Class
     if (settings.theme === 'light') {
       document.documentElement.classList.remove('dark');
     } else {
@@ -69,7 +61,6 @@ export default function App() {
     }
   }, [settings]);
 
-  // --- Handlers ---
   const handleAddLink = (newLink: Omit<LinkItem, 'id' | 'visits'>) => {
     const id = Date.now().toString();
     setLinks(prev => [...prev, { ...newLink, id, visits: 0 }]);
@@ -87,12 +78,9 @@ export default function App() {
 
   const handleAiQuery = async () => {
     if (!searchQuery.trim()) return;
-    
     setIsThinking(true);
     setAiResponse(null);
-    
     const response = await askGemini(searchQuery);
-    
     setAiResponse(response);
     setIsThinking(false);
   };
@@ -105,10 +93,8 @@ export default function App() {
     return false;
   };
 
-  // --- Filtering ---
   const filteredLinks = useMemo(() => {
     return links.filter(link => {
-      // If category was deleted, show in 'all' but not in specific tabs unless matched
       const matchesCategory = activeCategory === 'all' || link.category === activeCategory;
       const matchesSearch = link.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                             link.url.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -117,16 +103,12 @@ export default function App() {
     });
   }, [links, activeCategory, searchQuery]);
 
-  // Time display
   const [time, setTime] = useState(new Date());
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
 
-  // --- Styles ---
-  // Apply custom background if set
-  // Fixed: If image is present, use it directly without heavy overlay (just slight tint for readability if needed, or none)
   const bgStyle = settings.backgroundImageUrl 
     ? { 
         backgroundImage: `url(${settings.backgroundImageUrl})`,
@@ -136,7 +118,6 @@ export default function App() {
       } 
     : {};
 
-  // --- Render ---
   if (isLocked) {
     return <LockScreen onUnlock={handleUnlock} />;
   }
@@ -146,15 +127,10 @@ export default function App() {
       className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-800 dark:text-slate-200 selection:bg-cyan-500/30 pb-20 transition-colors duration-500"
       style={bgStyle}
     >
-      {/* Default Background Gradient (if no image) */}
       {!settings.backgroundImageUrl ? (
         <div className="fixed inset-0 -z-10 bg-gradient-to-br from-slate-50 to-slate-200 dark:from-[#1e293b] dark:to-[#0f172a] dark:bg-[radial-gradient(ellipse_at_top,#1e293b,#0f172a)] transition-colors duration-500" />
-      ) : (
-        // Slight dark overlay only when image exists to ensure text is readable, but much lighter than before
-        <div className="fixed inset-0 -z-10 bg-black/10 transition-colors duration-500" />
-      )}
+      ) : null}
       
-      {/* Header Controls */}
       <div className="absolute top-4 right-4 md:top-6 md:right-8 z-20 flex gap-3">
         <button 
           onClick={() => setIsHelpOpen(true)}
@@ -179,7 +155,6 @@ export default function App() {
         </button>
       </div>
 
-      {/* Hero Section */}
       <div className="pt-20 pb-8 px-4 md:px-8 max-w-7xl mx-auto flex flex-col items-center text-center">
         <div className="mb-8 animate-in fade-in slide-in-from-top-4 duration-700">
           <h1 className="text-6xl md:text-8xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-600 to-blue-700 dark:from-cyan-400 dark:to-blue-600 tracking-tight font-[Inter] drop-shadow-sm">
@@ -190,7 +165,6 @@ export default function App() {
           </p>
         </div>
 
-        {/* Search Bar */}
         <div className="w-full max-w-2xl relative group z-10">
           <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl blur opacity-20 group-hover:opacity-50 transition duration-500"></div>
           <div className="relative flex items-center bg-white/80 dark:bg-slate-900/90 backdrop-blur-md border border-slate-200 dark:border-slate-700/50 rounded-xl overflow-hidden shadow-xl dark:shadow-2xl transition-colors duration-300">
@@ -230,7 +204,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* AI Response Area */}
         {aiResponse && (
           <div className="mt-8 w-full max-w-2xl bg-white/90 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/50 rounded-2xl p-6 text-left shadow-2xl backdrop-blur-md animate-in fade-in slide-in-from-bottom-4 transition-colors">
             <div className="flex items-center justify-between mb-3">
@@ -252,10 +225,7 @@ export default function App() {
         )}
       </div>
 
-      {/* Navigation Container */}
       <div className="max-w-7xl mx-auto px-4 md:px-8 mt-8">
-        
-        {/* Category Tabs */}
         <div className="flex flex-wrap justify-center gap-2 mb-10">
           <button
             onClick={() => setActiveCategory('all')}
@@ -289,7 +259,6 @@ export default function App() {
           </button>
         </div>
 
-        {/* Grid Content */}
         {filteredLinks.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 pb-10">
             {filteredLinks.map(link => (

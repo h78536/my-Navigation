@@ -3,7 +3,7 @@ export interface LinkItem {
   title: string;
   url: string;
   category: string;
-  icon?: string; // Emoji or Initials
+  icon?: string;
   description?: string;
   visits: number;
 }
