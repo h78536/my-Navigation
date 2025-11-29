@@ -1,17 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, Search, Sparkles, Command, Settings as SettingsIcon, Wand2, CircleHelp } from 'lucide-react';
-import { LinkItem, Category, AppSettings } from '../types';
-import { DEFAULT_CATEGORIES, DEFAULT_LINKS, TRANSLATIONS } from '../constants';
-import { LinkCard } from '../components/LinkCard';
-import { AddLinkModal } from '../components/AddLinkModal';
-import { SettingsModal } from '../components/SettingsModal';
-import { ImageEditorModal } from '../components/ImageEditorModal';
-import { HelpModal } from '../components/HelpModal';
-import { LockScreen } from '../components/LockScreen';
-import { askGemini } from '../services/geminiService';
+import { LinkItem, Category, AppSettings } from './types';
+import { DEFAULT_CATEGORIES, DEFAULT_LINKS, TRANSLATIONS } from './constants';
+import { LinkCard } from './components/LinkCard';
+import { AddLinkModal } from './components/AddLinkModal';
+import { SettingsModal } from './components/SettingsModal';
+import { ImageEditorModal } from './components/ImageEditorModal';
+import { HelpModal } from './components/HelpModal';
+import { LockScreen } from './components/LockScreen';
+import { askGemini } from './services/geminiService';
 
 export default function App() {
-  // --- State ---
   const [links, setLinks] = useState<LinkItem[]>(() => {
     const saved = localStorage.getItem('mynav_links');
     return saved ? JSON.parse(saved) : DEFAULT_LINKS;
@@ -28,7 +27,6 @@ export default function App() {
     return saved ? JSON.parse(saved) : { theme: 'dark', language: 'zh' };
   });
 
-  // Lock state defaults to true if a password is set
   const [isLocked, setIsLocked] = useState<boolean>(() => {
     const savedSettings = localStorage.getItem('mynav_settings');
     const parsedSettings = savedSettings ? JSON.parse(savedSettings) : {};
@@ -42,15 +40,11 @@ export default function App() {
   const [isImageEditorOpen, setIsImageEditorOpen] = useState(false);
   const [isHelpOpen, setIsHelpOpen] = useState(false);
   
-  // AI State
   const [aiResponse, setAiResponse] = useState<string | null>(null);
   const [isThinking, setIsThinking] = useState(false);
 
-  // --- Helpers ---
-  // Get current language strings
-  const t = TRANSLATIONS[(settings.language === 'en' ? 'en' : 'zh')];
+  const t = TRANSLATIONS[settings.language === 'en' ? 'en' : 'zh'];
 
-  // --- Effects ---
   useEffect(() => {
     localStorage.setItem('mynav_links', JSON.stringify(links));
   }, [links]);
@@ -61,7 +55,6 @@ export default function App() {
 
   useEffect(() => {
     localStorage.setItem('mynav_settings', JSON.stringify(settings));
-    // Handle Theme Class
     if (settings.theme === 'light') {
       document.documentElement.classList.remove('dark');
     } else {
@@ -69,7 +62,6 @@ export default function App() {
     }
   }, [settings]);
 
-  // --- Handlers ---
   const handleAddLink = (newLink: Omit<LinkItem, 'id' | 'visits'>) => {
     const id = Date.now().toString();
     setLinks(prev => [...prev, { ...newLink, id, visits: 0 }]);
@@ -87,12 +79,9 @@ export default function App() {
 
   const handleAiQuery = async () => {
     if (!searchQuery.trim()) return;
-    
     setIsThinking(true);
     setAiResponse(null);
-    
     const response = await askGemini(searchQuery);
-    
     setAiResponse(response);
     setIsThinking(false);
   };
@@ -105,10 +94,8 @@ export default function App() {
     return false;
   };
 
-  // --- Filtering ---
   const filteredLinks = useMemo(() => {
     return links.filter(link => {
-      // If category was deleted, show in 'all' but not in specific tabs unless matched
       const matchesCategory = activeCategory === 'all' || link.category === activeCategory;
       const matchesSearch = link.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                             link.url.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -117,16 +104,12 @@ export default function App() {
     });
   }, [links, activeCategory, searchQuery]);
 
-  // Time display
   const [time, setTime] = useState(new Date());
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 60000);
     return () => clearInterval(timer);
   }, []);
 
-  // --- Styles ---
-  // Apply custom background if set
-  // Fixed: If image is present, use it directly without heavy overlay
   const bgStyle = settings.backgroundImageUrl 
     ? { 
         backgroundImage: `url(${settings.backgroundImageUrl})`,
@@ -136,7 +119,6 @@ export default function App() {
       } 
     : {};
 
-  // --- Render ---
   if (isLocked) {
     return <LockScreen onUnlock={handleUnlock} />;
   }
@@ -146,13 +128,10 @@ export default function App() {
       className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-800 dark:text-slate-200 selection:bg-cyan-500/30 pb-20 transition-colors duration-500"
       style={bgStyle}
     >
-      {/* Default Background Gradient (if no image) */}
+      {/* Background logic: Only show gradient if NO image is set. If image is set, show nothing (transparent) so image shows clearly. */}
       {!settings.backgroundImageUrl ? (
         <div className="fixed inset-0 -z-10 bg-gradient-to-br from-slate-50 to-slate-200 dark:from-[#1e293b] dark:to-[#0f172a] dark:bg-[radial-gradient(ellipse_at_top,#1e293b,#0f172a)] transition-colors duration-500" />
-      ) : (
-        // Slight dark overlay only when image exists to ensure text is readable, but much lighter than before
-        <div className="fixed inset-0 -z-10 bg-black/10 transition-colors duration-500" />
-      )}
+      ) : null}
       
       {/* Header Controls */}
       <div className="absolute top-4 right-4 md:top-6 md:right-8 z-20 flex gap-3">

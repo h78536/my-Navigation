@@ -16,6 +16,7 @@ export const LinkCard: React.FC<LinkCardProps> = ({ link, onDelete, onVisit }) =
     window.open(link.url, '_blank', 'noopener,noreferrer');
   };
 
+  // Helper to extract hostname for favicon
   const getHostname = (url: string) => {
     try {
       return new URL(url).hostname;
@@ -25,11 +26,13 @@ export const LinkCard: React.FC<LinkCardProps> = ({ link, onDelete, onVisit }) =
   };
 
   const hostname = getHostname(link.url);
+  // Use Google's favicon service. sz=128 requests a higher resolution icon.
   const faviconUrl = hostname ? `https://www.google.com/s2/favicons?domain=${hostname}&sz=128` : '';
 
   return (
     <div className="group relative bg-white/80 dark:bg-slate-800/50 hover:bg-white hover:shadow-lg dark:hover:bg-slate-700/60 border border-slate-200 dark:border-slate-700 hover:border-cyan-200 dark:hover:border-slate-500 transition-all duration-300 rounded-xl p-4 flex flex-col gap-3 backdrop-blur-sm shadow-sm hover:shadow-cyan-500/10">
       <div className="flex justify-between items-start">
+        {/* Transparent Icon Container - Removed bg-white and borders */}
         <div 
           className="w-12 h-12 flex items-center justify-center cursor-pointer hover:scale-110 transition-transform overflow-hidden"
           onClick={handleVisit}
@@ -42,6 +45,7 @@ export const LinkCard: React.FC<LinkCardProps> = ({ link, onDelete, onVisit }) =
                onError={() => setImgError(true)}
              />
           ) : (
+            // Fallback to initial or custom icon if favicon fails
             <span className="text-3xl drop-shadow-md filter">
               {link.icon && link.icon !== '🔗' ? link.icon : (link.title.charAt(0).toUpperCase() || <Globe size={28} />)}
             </span>
