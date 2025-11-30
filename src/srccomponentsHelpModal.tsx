@@ -132,12 +132,50 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
                 <div className="flex gap-4">
                   <div className="flex-none w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold">4</div>
                   <div>
-                    <h4 className="font-bold text-slate-900 dark:text-white">等待自动部署</h4>
+                    <h4 className="font-bold text-slate-900 dark:text-white">检查部署进度 (1-3分钟)</h4>
                     <p className="text-sm mt-1">
-                      配置完成后，点击 <strong>Actions</strong> 标签页，您应该能看到一个名为 "Deploy to GitHub Pages" 的工作流正在运行。
+                      点击仓库最上方的 <strong>Actions</strong> 标签页（不是在 Settings 里）。
                       <br />
-                      等待它变成绿色对勾 ✅，您就可以在 Settings -> Pages 中看到您的网站地址了！
+                      您应该能看到一个正在运行的工作流。等待它变成绿色对勾 ✅。
+                      <br />
+                      完成后，回到 Settings -> Pages 即可看到生成的网站链接。
                     </p>
+                  </div>
+                </div>
+                
+                {/* Troubleshooting Section - Enhanced */}
+                <div className="bg-amber-50 dark:bg-amber-900/20 p-4 rounded-xl border border-amber-100 dark:border-amber-800 mt-6 text-left space-y-4">
+                  <div>
+                    <h4 className="font-bold text-amber-800 dark:text-amber-200 flex items-center gap-2 mb-2">
+                      <PlayCircle size={18} />
+                      没有看到部署开始？
+                    </h4>
+                    <p className="text-sm text-amber-700 dark:text-amber-300">
+                      如果 Actions 列表是空的，您可以手动触发：
+                      <br/>
+                      1. 在 Actions 页面左侧点击 <strong>Deploy to GitHub Pages</strong>。
+                      <br/>
+                      2. 点击右侧的 <strong>Run workflow</strong> 按钮。
+                    </p>
+                  </div>
+
+                  <div className="border-t border-amber-200 dark:border-amber-800/50 pt-3">
+                    <h4 className="font-bold text-amber-800 dark:text-amber-200 flex items-center gap-2 mb-2">
+                      <AlertTriangle size={18} />
+                      推送失败？(Git Error)
+                    </h4>
+                    <p className="text-xs text-amber-700 dark:text-amber-300 mb-2">
+                       如果遇到 <code>failed to push</code>，请尝试以下重建命令（最彻底的解决方法）：
+                    </p>
+                    <div className="bg-white dark:bg-black/40 p-3 rounded border border-amber-200 dark:border-amber-800/50 font-mono text-xs select-all whitespace-pre-wrap text-slate-600 dark:text-slate-400">
+rm -rf .git
+git init
+git branch -M main
+git add .
+git commit -m "Re-init"
+git remote add origin https://github.com/您的用户名/仓库名.git
+git push -u -f origin main
+                    </div>
                   </div>
                 </div>
               </section>
