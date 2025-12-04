@@ -138,7 +138,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
                       <br />
                       您应该能看到一个正在运行的工作流。等待它变成绿色对勾 ✅。
                       <br />
-                      完成后，回到 Settings -> Pages 即可看到生成的网站链接。
+                      完成后，回到 Settings -&gt; Pages 即可看到生成的网站链接。
                     </p>
                   </div>
                 </div>
