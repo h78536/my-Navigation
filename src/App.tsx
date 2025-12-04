@@ -120,17 +120,12 @@ export default function App() {
 
   // --- Styles ---
   // Apply custom background if set
-  // Adjust overlay based on theme: Dark mode needs dark overlay, Light mode needs light overlay
-  const bgOverlay = settings.theme === 'light' 
-    ? 'rgba(241, 245, 249, 0.85), rgba(248, 250, 252, 0.9)' // Light slate overlay
-    : 'rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.95)'; // Dark slate overlay
-
   const bgStyle = settings.backgroundImageUrl 
     ? { 
-        backgroundImage: `linear-gradient(to bottom, ${bgOverlay}), url(${settings.backgroundImageUrl})`,
+        backgroundImage: `url(${settings.backgroundImageUrl})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
+        backgroundAttachment: 'fixed',
       } 
     : {};
 
@@ -142,33 +137,33 @@ export default function App() {
   return (
     <div 
       className="min-h-screen bg-slate-50 dark:bg-[#0f172a] text-slate-800 dark:text-slate-200 selection:bg-cyan-500/30 pb-20 transition-colors duration-500"
-      style={!settings.backgroundImageUrl ? {} : bgStyle}
+      style={bgStyle}
     >
       {/* Default Background Gradient (if no image) */}
-      {!settings.backgroundImageUrl && (
+      {!settings.backgroundImageUrl ? (
         <div className="fixed inset-0 -z-10 bg-gradient-to-br from-slate-50 to-slate-200 dark:from-[#1e293b] dark:to-[#0f172a] dark:bg-[radial-gradient(ellipse_at_top,#1e293b,#0f172a)] transition-colors duration-500" />
-      )}
+      ) : null}
       
       {/* Header Controls */}
       <div className="absolute top-4 right-4 md:top-6 md:right-8 z-20 flex gap-3">
         <button 
           onClick={() => setIsHelpOpen(true)}
-          className="p-2 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/10 transition-all"
-          title="帮助与指南"
+          className="p-2 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/10 transition-all bg-white/50 dark:bg-black/20 backdrop-blur-sm"
+          title={t.help}
         >
           <HelpCircle size={20} />
         </button>
         <button 
           onClick={() => setIsImageEditorOpen(true)}
-          className="p-2 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/10 transition-all"
-          title="AI 图片编辑"
+          className="p-2 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/10 transition-all bg-white/50 dark:bg-black/20 backdrop-blur-sm"
+          title={t.imageEditor}
         >
           <Wand2 size={20} />
         </button>
         <button 
           onClick={() => setIsSettingsOpen(true)}
-          className="p-2 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/10 transition-all"
-          title="设置"
+          className="p-2 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-200/50 dark:text-slate-400 dark:hover:text-white dark:hover:bg-white/10 transition-all bg-white/50 dark:bg-black/20 backdrop-blur-sm"
+          title={t.settings}
         >
           <SettingsIcon size={20} />
         </button>
