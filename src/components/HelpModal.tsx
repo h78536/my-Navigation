@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Book, Cloud, Github, CircleHelp, AlertTriangle, PlayCircle } from 'lucide-react';
+import { X, Book, Cloud, Github, HelpCircle, AlertTriangle, PlayCircle } from 'lucide-react';
 
 interface HelpModalProps {
   isOpen: boolean;
