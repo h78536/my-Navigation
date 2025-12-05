@@ -1,19 +1,15 @@
 name: Deploy to GitHub Pages
 
 on:
-  # Trigger on push to main branch
   push:
     branches: ["main"]
-  # Allow manual trigger from Actions tab
   workflow_dispatch:
 
-# Set permissions
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow concurrent deployments
 concurrency:
   group: "pages"
   cancel-in-progress: true
@@ -29,7 +25,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          cache: 'npm'
+          # Cache removed to prevent "Dependencies lock file is not found" error
           
       - name: Install dependencies
         run: npm install
@@ -37,7 +33,6 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # Configure this secret in GitHub Settings -> Secrets -> Actions
           VITE_API_KEY: ${{ secrets.VITE_API_KEY }}
           
       - name: Upload artifact
