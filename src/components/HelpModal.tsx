@@ -18,7 +18,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
           <h2 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
-             <CircleHelp className="text-blue-600 dark:text-blue-400" />
+             <HelpCircle className="text-blue-600 dark:text-blue-400" />
              帮助与指南
           </h2>
           <button 
@@ -108,7 +108,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
                     <p className="text-sm mt-1 mb-2">为了让 AI 功能在部署后可用，您需要配置密钥：</p>
                     <ul className="list-disc list-inside text-sm space-y-1 ml-1 bg-slate-100 dark:bg-slate-800 p-3 rounded-lg">
                       <li>进入 GitHub 仓库页面。</li>
-                      <li>点击 <strong>Settings</strong> (设置) &rarr; <strong>Secrets and variables</strong> &rarr; <strong>Actions</strong>。</li>
+                      <li>点击 <strong>Settings</strong> &rarr; <strong>Secrets and variables</strong> &rarr; <strong>Actions</strong>。</li>
                       <li>点击 <strong>New repository secret</strong>。</li>
                       <li>Name 输入: <code>VITE_API_KEY</code></li>
                       <li>Secret 输入: 您的 Gemini API Key。</li>
@@ -138,7 +138,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({ isOpen, onClose }) => {
                       <br />
                       您应该能看到一个正在运行的工作流。等待它变成绿色对勾 ✅。
                       <br />
-                      完成后，回到 Settings -&gt; Pages 即可看到生成的网站链接。
+                      完成后，回到 Settings &rarr; Pages 即可看到生成的网站链接。
                     </p>
                   </div>
                 </div>
