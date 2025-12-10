@@ -1,7 +1,15 @@
 import { GoogleGenAI } from "@google/genai";
 
 export const askGemini = async (prompt: string): Promise<string> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+  // Use Vite's import.meta.env to access environment variables
+  const apiKey = import.meta.env.VITE_API_KEY;
+  
+  if (!apiKey) {
+    console.error("API Key is missing. Please check your .env file or GitHub Secrets.");
+    return "API Key 未配置，无法使用 AI 功能。";
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
 
   try {
     const response = await ai.models.generateContent({
@@ -11,6 +19,7 @@ export const askGemini = async (prompt: string): Promise<string> => {
         systemInstruction: "你是一个集成在个人导航仪表盘中的乐于助人、简洁的 AI 助手。请使用中文回答。回答应简短、直接、有帮助。支持 Markdown 格式。",
       }
     });
+    
     return response.text || "未生成回复。";
   } catch (error) {
     console.error("Gemini API Error:", error);
@@ -19,7 +28,13 @@ export const askGemini = async (prompt: string): Promise<string> => {
 };
 
 export const editImage = async (imageBase64: string, prompt: string): Promise<string | null> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
+  const apiKey = import.meta.env.VITE_API_KEY;
+  if (!apiKey) {
+    console.error("API Key is missing.");
+    return null;
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
   
   const match = imageBase64.match(/^data:(.+);base64,(.+)$/);
   if (!match) {

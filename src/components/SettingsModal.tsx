@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Save, Image as ImageIcon, Lock, List, Plus, Trash2, Edit2, Check, Settings as SettingsIcon, Moon, Sun, Download, Upload, Database, Globe } from 'lucide-react';
+import { X, Save, Image as ImageIcon, Lock, List, Plus, Trash2, Edit2, Check, Settings as SettingsIcon, Sun, Download, Upload, Database, Globe, Moon } from 'lucide-react';
 import { AppSettings, Category, LinkItem } from '../types';
 
 interface SettingsModalProps {
@@ -52,14 +52,29 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
   };
 
   const handleDeleteCategory = (id: string) => {
-    if (categories.length <= 1) return alert("至少需要保留一个分类。");
-    if (window.confirm("确定要删除此分类吗？")) onUpdateCategories(categories.filter(c => c.id !== id));
+    if (categories.length <= 1) {
+      alert("至少需要保留一个分类。");
+      return;
+    }
+    if (window.confirm("确定要删除此分类吗？")) {
+      onUpdateCategories(categories.filter(c => c.id !== id));
+    }
+  };
+
+  const startEditing = (category: Category) => {
+    setEditingId(category.id);
+    setEditName(category.name);
   };
 
   const saveEditing = (id: string) => {
     if (!editName.trim()) return;
     onUpdateCategories(categories.map(c => c.id === id ? { ...c, name: editName.trim() } : c));
     setEditingId(null);
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditName('');
   };
 
   const handleExport = () => {
@@ -76,11 +91,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
     reader.onload = (event) => {
       try {
         const json = JSON.parse(event.target?.result as string);
-        if (json.links && Array.isArray(json.links) && window.confirm("确定要覆盖当前数据吗？")) {
-          onUpdateLinks(json.links);
-          if (json.categories) onUpdateCategories(json.categories);
-          if (json.settings) onSave(json.settings);
-          alert("导入成功！"); onClose();
+        if (json.links && Array.isArray(json.links)) {
+          if (window.confirm("确定要覆盖当前数据吗？")) {
+            onUpdateLinks(json.links);
+            if (json.categories) onUpdateCategories(json.categories);
+            if (json.settings) onSave(json.settings);
+            alert("导入成功！");
+            onClose();
+          }
+        } else {
+          alert("无效的备份文件格式。");
         }
       } catch (err) { alert("文件无效"); }
     };
@@ -102,16 +122,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, s
         <div className="p-6 overflow-y-auto custom-scrollbar">
           {activeTab === 'general' && (
             <form onSubmit={handleGeneralSubmit} className="space-y-6">
-              <div className="space-y-2"><label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300"><Globe size={16} /> 语言</label><div className="flex gap-3"><button type="button" onClick={() => setLanguage('zh')} className={`flex-1 py-3 rounded-xl border ${language === 'zh' ? 'bg-slate-100 border-cyan-500' : 'border-slate-200'}`}>中文</button><button type="button" onClick={() => setLanguage('en')} className={`flex-1 py-3 rounded-xl border ${language === 'en' ? 'bg-slate-100 border-cyan-500' : 'border-slate-200'}`}>English</button></div></div>
-              <div className="space-y-2"><label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300"><Sun size={16} /> 主题</label><div className="flex gap-3"><button type="button" onClick={() => setTheme('light')} className={`flex-1 py-3 rounded-xl border ${theme === 'light' ? 'bg-slate-100 border-cyan-500' : 'border-slate-200'}`}>浅色</button><button type="button" onClick={() => setTheme('dark')} className={`flex-1 py-3 rounded-xl border ${theme === 'dark' ? 'bg-slate-100 border-cyan-500' : 'border-slate-200'}`}>深色</button></div></div>
+              <div className="space-y-2"><label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300"><Globe size={16} /> 语言</label><div className="flex gap-3"><button type="button" onClick={() => setLanguage('zh')} className={`flex-1 py-3 rounded-xl border ${language === 'zh' ? 'bg-slate-100 dark:bg-slate-800 border-cyan-500' : 'border-slate-200'}`}>中文</button><button type="button" onClick={() => setLanguage('en')} className={`flex-1 py-3 rounded-xl border ${language === 'en' ? 'bg-slate-100 dark:bg-slate-800 border-cyan-500' : 'border-slate-200'}`}>English</button></div></div>
+              <div className="space-y-2"><label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300"><Sun size={16} /> 主题</label><div className="flex gap-3"><button type="button" onClick={() => setTheme('light')} className={`flex-1 py-3 rounded-xl border ${theme === 'light' ? 'bg-slate-100 dark:bg-slate-800 border-cyan-500' : 'border-slate-200'}`}>浅色</button><button type="button" onClick={() => setTheme('dark')} className={`flex-1 py-3 rounded-xl border ${theme === 'dark' ? 'bg-slate-100 dark:bg-slate-800 border-cyan-500' : 'border-slate-200'}`}>深色</button></div></div>
               <div className="space-y-2"><label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300"><ImageIcon size={16} /> 背景图片链接</label><input type="text" value={bgUrl} onChange={(e) => setBgUrl(e.target.value)} className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 rounded-lg px-4 py-2.5 outline-none" /></div>
               <div className="space-y-2"><label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300"><Lock size={16} /> 访问密码</label><input type="text" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 rounded-lg px-4 py-2.5 outline-none" /></div>
-              <button type="submit" className="w-full mt-4 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"><Save size={18} /> 保存</button>
+              <button type="submit" className="w-full mt-4 bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 text-white font-semibold py-3 rounded-lg flex items-center justify-center gap-2"><Save size={18} /> 保存</button>
             </form>
           )}
           {activeTab === 'categories' && (
             <div className="space-y-6">
-               <div className="space-y-2">{categories.map(c => (<div key={c.id} className="flex items-center justify-between bg-slate-100 dark:bg-slate-800 rounded-lg p-3 border border-slate-200">{editingId === c.id ? (<><input value={editName} onChange={(e)=>setEditName(e.target.value)} className="flex-1 bg-white border rounded px-2 py-1"/><button onClick={()=>saveEditing(c.id)}><Check size={16}/></button></>) : (<><span className="text-sm">{c.name}</span><div className="flex gap-1"><button onClick={()=>setEditingId(c.id) || setEditName(c.name)}><Edit2 size={14}/></button><button onClick={()=>handleDeleteCategory(c.id)}><Trash2 size={14}/></button></div></>)}</div>))}</div>
+               <div className="space-y-2">{categories.map(c => (<div key={c.id} className="flex items-center justify-between bg-slate-100 dark:bg-slate-800 rounded-lg p-3 border border-slate-200">{editingId === c.id ? (<><input value={editName} onChange={(e)=>setEditName(e.target.value)} className="flex-1 bg-white border rounded px-2 py-1"/><button onClick={()=>saveEditing(c.id)}><Check size={16}/></button></>) : (<><span className="text-sm">{c.name}</span><div className="flex gap-1"><button onClick={() => { setEditingId(c.id); setEditName(c.name); }}><Edit2 size={14}/></button><button onClick={()=>handleDeleteCategory(c.id)}><Trash2 size={14}/></button></div></>)}</div>))}</div>
                <div className="flex gap-2"><input value={newCategoryName} onChange={(e)=>setNewCategoryName(e.target.value)} placeholder="新分类名称" className="flex-1 bg-slate-100 dark:bg-slate-800 border rounded-lg px-4 py-2"/><button onClick={handleAddCategory} disabled={!newCategoryName.trim()} className="bg-cyan-600 text-white px-4 rounded-lg"><Plus size={18}/></button></div>
             </div>
           )}
